@@ -41,3 +41,17 @@ jobs:
         with:
           name: ci-logs
           path: logs/
+
+      - name: Send Slack notification (success)
+        if: success()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: |
+          curl -X POST -H "Content-type: application/json" --data "{\"text\":\"CI SUCCESS: ${{ github.repository }}\\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK"
+
+      - name: Send Slack notification (failure)
+        if: failure()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: |
+          curl -X POST -H "Content-type: application/json" --data "{\"text\":\"CI FAILED: ${{ github.repository }}\\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK"
